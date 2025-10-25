@@ -1,0 +1,1 @@
+- use pnpm to install or uninstall packages
