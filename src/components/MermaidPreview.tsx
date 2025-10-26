@@ -45,9 +45,14 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
               minZoom: 0.1,
               bounds: true,
               boundsPadding: 0.1,
-              zoomSpeed: 0.2,
+              zoomSpeed: 3,
               smoothScroll: false,
-              // pinchSpeed: 8,
+              // Only allow zoom when Ctrl (Windows) or Cmd (Mac) is pressed
+              beforeWheel: (e) => {
+                // Allow zoom only if Ctrl or Cmd key is pressed
+                const shouldZoom = e.ctrlKey || e.metaKey;
+                return !shouldZoom; // return true to prevent panzoom handling
+              },
             });
 
             panzoomInstanceRef.current = instance;
@@ -185,11 +190,11 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 overflow-hidden p-0">
+      <CardContent className="flex-1 overflow-y-auto overflow-x-hidden p-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <div ref={containerRef} className="w-full h-full relative">
           <div
             ref={svgContainerRef}
-            className="w-full h-full flex items-center justify-center"
+            className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
           ></div>
         </div>
       </CardContent>
