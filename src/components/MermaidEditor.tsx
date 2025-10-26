@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Card } from "@/ui/card";
 import { Textarea } from "@/ui/textarea";
 
 interface MermaidEditorProps {
@@ -26,7 +26,8 @@ export default function MermaidEditor({ code, onChange }: MermaidEditorProps) {
 
         // Find the start of the first selected line
         const lineStart = beforeSelection.lastIndexOf("\n") + 1;
-        const selectedLines = beforeSelection.substring(lineStart) + selectedText;
+        const selectedLines =
+          beforeSelection.substring(lineStart) + selectedText;
 
         // Indent each line
         const indentedLines = selectedLines
@@ -41,9 +42,7 @@ export default function MermaidEditor({ code, onChange }: MermaidEditorProps) {
           .join("\n");
 
         const newCode =
-          code.substring(0, lineStart) +
-          indentedLines +
-          afterSelection;
+          code.substring(0, lineStart) + indentedLines + afterSelection;
 
         onChange(newCode);
 
@@ -55,15 +54,14 @@ export default function MermaidEditor({ code, onChange }: MermaidEditorProps) {
       } else {
         // Insert indent at cursor position
         const newCode =
-          code.substring(0, start) +
-          indentChar +
-          code.substring(start);
+          code.substring(0, start) + indentChar + code.substring(start);
 
         onChange(newCode);
 
         // Move cursor after the inserted indent
         setTimeout(() => {
-          textarea.selectionStart = textarea.selectionEnd = start + indentChar.length;
+          textarea.selectionStart = textarea.selectionEnd =
+            start + indentChar.length;
         }, 0);
       }
     }
@@ -82,7 +80,8 @@ export default function MermaidEditor({ code, onChange }: MermaidEditorProps) {
         const afterSelection = code.substring(end);
 
         const lineStart = beforeSelection.lastIndexOf("\n") + 1;
-        const selectedLines = beforeSelection.substring(lineStart) + selectedText;
+        const selectedLines =
+          beforeSelection.substring(lineStart) + selectedText;
 
         // Unindent each line
         const unindentedLines = selectedLines
@@ -96,15 +95,16 @@ export default function MermaidEditor({ code, onChange }: MermaidEditorProps) {
           .join("\n");
 
         const newCode =
-          code.substring(0, lineStart) +
-          unindentedLines +
-          afterSelection;
+          code.substring(0, lineStart) + unindentedLines + afterSelection;
 
         onChange(newCode);
 
         // Restore selection
         setTimeout(() => {
-          textarea.selectionStart = Math.max(start - indentChar.length, lineStart);
+          textarea.selectionStart = Math.max(
+            start - indentChar.length,
+            lineStart
+          );
           textarea.selectionEnd = end - indentChar.length;
         }, 0);
       } else {
@@ -120,7 +120,8 @@ export default function MermaidEditor({ code, onChange }: MermaidEditorProps) {
           onChange(newCode);
 
           setTimeout(() => {
-            textarea.selectionStart = textarea.selectionEnd = start - indentChar.length;
+            textarea.selectionStart = textarea.selectionEnd =
+              start - indentChar.length;
           }, 0);
         }
       }

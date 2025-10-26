@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import panzoom, { type PanZoom } from "panzoom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { CardContent, CardHeader } from "@/ui/card";
 import { Button } from "@/ui/button";
-import { ZoomIn, ZoomOut, Maximize2, RotateCw } from "lucide-react";
+import { ZoomIn, ZoomOut, RotateCw } from "lucide-react";
 
 interface MermaidPreviewProps {
   code: string;
@@ -114,27 +114,27 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
     }
   };
 
-  const handleCenter = () => {
-    if (
-      panzoomInstanceRef.current &&
-      svgContainerRef.current &&
-      containerRef.current
-    ) {
-      const svgElement = svgContainerRef.current.querySelector("svg");
-      if (svgElement) {
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const svgRect = svgElement.getBBox();
-        const transform = panzoomInstanceRef.current.getTransform();
+  // const handleCenter = () => {
+  //   if (
+  //     panzoomInstanceRef.current &&
+  //     svgContainerRef.current &&
+  //     containerRef.current
+  //   ) {
+  //     const svgElement = svgContainerRef.current.querySelector("svg");
+  //     if (svgElement) {
+  //       const containerRect = containerRef.current.getBoundingClientRect();
+  //       const svgRect = svgElement.getBBox();
+  //       const transform = panzoomInstanceRef.current.getTransform();
 
-        const centerX =
-          (containerRect.width - svgRect.width * transform.scale) / 2;
-        const centerY =
-          (containerRect.height - svgRect.height * transform.scale) / 2;
+  //       const centerX =
+  //         (containerRect.width - svgRect.width * transform.scale) / 2;
+  //       const centerY =
+  //         (containerRect.height - svgRect.height * transform.scale) / 2;
 
-        panzoomInstanceRef.current.moveTo(centerX, centerY);
-      }
-    }
-  };
+  //       panzoomInstanceRef.current.moveTo(centerX, centerY);
+  //     }
+  //   }
+  // };
 
   return (
     <div className="h-full flex flex-col">
