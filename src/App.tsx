@@ -3,11 +3,7 @@ import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 import MermaidEditor from "./components/MermaidEditor";
 import MermaidPreview from "./components/MermaidPreview";
 import { AppSidebar } from "./components/app-sidebar";
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "./ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
 import { diagramDB, type Diagram } from "./services/diagramDB";
 import { Eye, FileCode } from "lucide-react";
 
@@ -53,13 +49,12 @@ function DiagramView() {
       }
 
       try {
-        const diagramId = parseInt(id, 10);
-        if (isNaN(diagramId)) {
+        if (!id) {
           navigate("/");
           return;
         }
 
-        const diagram = await diagramDB.getById(diagramId);
+        const diagram = await diagramDB.getById(id);
         if (diagram) {
           setCurrentDiagram(diagram);
           setCode(diagram.code);

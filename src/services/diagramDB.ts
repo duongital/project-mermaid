@@ -1,5 +1,7 @@
+import { v4 as uuidv4 } from "uuid";
+
 export interface Diagram {
-  id?: number;
+  id?: string;
   name: string;
   code: string;
   createdAt: Date;
@@ -32,7 +34,6 @@ class DiagramDB {
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const objectStore = db.createObjectStore(STORE_NAME, {
             keyPath: "id",
-            autoIncrement: true,
           });
 
           objectStore.createIndex("name", "name", { unique: false });
@@ -50,16 +51,18 @@ class DiagramDB {
     return this.db;
   }
 
-  async create(diagram: Omit<Diagram, "id">): Promise<number> {
+  async create(diagram: Omit<Diagram, "id">): Promise<string> {
     const db = this.ensureDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([STORE_NAME], "readwrite");
       const store = transaction.objectStore(STORE_NAME);
 
-      const request = store.add(diagram);
+      const id = uuidv4();
+      const diagramWithId = { ...diagram, id };
+      const request = store.add(diagramWithId);
 
       request.onsuccess = () => {
-        resolve(request.result as number);
+        resolve(id);
       };
 
       request.onerror = () => {
@@ -85,7 +88,7 @@ class DiagramDB {
     });
   }
 
-  async getById(id: number): Promise<Diagram | undefined> {
+  async getById(id: string): Promise<Diagram | undefined> {
     const db = this.ensureDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([STORE_NAME], "readonly");
@@ -102,7 +105,7 @@ class DiagramDB {
     });
   }
 
-  async update(id: number, diagram: Partial<Diagram>): Promise<void> {
+  async update(id: string, diagram: Partial<Diagram>): Promise<void> {
     const db = this.ensureDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([STORE_NAME], "readwrite");
@@ -140,7 +143,7 @@ class DiagramDB {
     });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     const db = this.ensureDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([STORE_NAME], "readwrite");

@@ -103,10 +103,11 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
         const scaleY = (containerRect.height - 100) / svgRect.height;
         const scale = Math.min(scaleX, scaleY, 1);
 
-        const centerX = (containerRect.width - svgRect.width * scale) / 2;
-        const centerY = (containerRect.height - svgRect.height * scale) / 2;
+        // Position at top-left with 50px padding
+        const topLeftX = 50;
+        const topLeftY = 50;
 
-        panzoomInstanceRef.current.moveTo(centerX, centerY);
+        panzoomInstanceRef.current.moveTo(topLeftX, topLeftY);
         panzoomInstanceRef.current.zoomAbs(0, 0, scale);
         setZoom(Math.round(scale * 100));
       }
@@ -136,10 +137,10 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col">
+    <div className="h-full flex flex-col">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Preview</CardTitle>
+          {/* <CardTitle>Preview</CardTitle> */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 border rounded-md">
               <Button
@@ -162,14 +163,14 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
                 <ZoomIn className="h-4 w-4" />
               </Button>
             </div>
-            <Button
+            {/* <Button
               onClick={handleCenter}
               variant="outline"
               size="icon"
               title="Center"
             >
               <Maximize2 className="h-4 w-4" />
-            </Button>
+            </Button> */}
             <Button
               onClick={resetZoom}
               variant="outline"
@@ -183,9 +184,12 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">
         <div ref={containerRef} className="w-full h-full relative">
-          <div ref={svgContainerRef} className="w-full h-full flex items-center justify-center"></div>
+          <div
+            ref={svgContainerRef}
+            className="w-full h-full flex items-center justify-center"
+          ></div>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }

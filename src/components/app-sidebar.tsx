@@ -10,13 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/ui/sidebar";
-import {
-  Settings,
-  Plus,
-  Trash2,
-  Edit,
-  FileText,
-} from "lucide-react";
+import { Plus, Trash2, Edit, FileText, MoreVertical } from "lucide-react";
 import { Button } from "@/ui/button";
 import { DiagramModal } from "./DiagramModal";
 import { diagramDB, type Diagram } from "@/services/diagramDB";
@@ -30,6 +24,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/ui/dropdown-menu";
 
 interface AppSidebarProps {
   currentDiagram: Diagram | null;
@@ -109,8 +109,9 @@ export function AppSidebar({
     <>
       <Sidebar>
         <SidebarHeader>
-          <div className="px-2 py-1">
-            <h2 className="text-lg font-semibold">Mermaid Editor</h2>
+          <div className="px-2 py-1 flex items-center gap-2">
+            <img src="/vite.svg" alt="Vite" className="h-6 w-6" />
+            <h2 className="text-lg font-semibold">Project Mermaid</h2>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -119,11 +120,11 @@ export function AppSidebar({
               <SidebarGroupLabel>My Diagrams</SidebarGroupLabel>
               <Button
                 size="icon"
-                variant="ghost"
-                className="h-6 w-6"
+                variant="outline"
+                className="h-10 w-10"
                 onClick={() => setIsModalOpen(true)}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-8 w-8" />
               </Button>
             </div>
             <SidebarGroupContent>
@@ -144,48 +145,43 @@ export function AppSidebar({
                           <FileText className="h-4 w-4" />
                           <span className="truncate">{diagram.name}</span>
                         </SidebarMenuButton>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-6 w-6"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingDiagram(diagram);
-                            }}
-                          >
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-6 w-6"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeletingDiagram(diagram);
-                            }}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingDiagram(diagram);
+                              }}
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeletingDiagram(diagram);
+                              }}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </SidebarMenuItem>
                   ))
                 )}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-
-          <SidebarGroup>
-            <SidebarGroupLabel>Actions</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Settings className="h-4 w-4" />
-                    <span>Settings</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
