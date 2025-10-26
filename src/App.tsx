@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 import MermaidEditor from "./components/MermaidEditor";
 import MermaidPreview from "./components/MermaidPreview";
 import { AppSidebar } from "./components/app-sidebar";
@@ -8,6 +9,7 @@ import {
   SidebarTrigger,
 } from "./ui/sidebar";
 import { diagramDB, type Diagram } from "./services/diagramDB";
+import { Eye, FileCode } from "lucide-react";
 
 const defaultCode = `graph TD
     A[Start] --> B{Is it working?}
@@ -18,10 +20,61 @@ const defaultCode = `graph TD
 
 type ViewMode = "preview" | "editor" | "split";
 
-function App() {
+function DiagramView() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [code, setCode] = useState(defaultCode);
   const [viewMode, setViewMode] = useState<ViewMode>("preview");
   const [currentDiagram, setCurrentDiagram] = useState<Diagram | null>(null);
+  const [isDbReady, setIsDbReady] = useState(false);
+
+  // Initialize database
+  useEffect(() => {
+    const initDB = async () => {
+      try {
+        await diagramDB.init();
+        setIsDbReady(true);
+      } catch (error) {
+        console.error("Failed to initialize database:", error);
+      }
+    };
+    initDB();
+  }, []);
+
+  // Load diagram from URL on mount or when id changes
+  useEffect(() => {
+    if (!isDbReady) return;
+
+    const loadDiagram = async () => {
+      if (!id) {
+        setCurrentDiagram(null);
+        setCode(defaultCode);
+        return;
+      }
+
+      try {
+        const diagramId = parseInt(id, 10);
+        if (isNaN(diagramId)) {
+          navigate("/");
+          return;
+        }
+
+        const diagram = await diagramDB.getById(diagramId);
+        if (diagram) {
+          setCurrentDiagram(diagram);
+          setCode(diagram.code);
+        } else {
+          // Diagram not found, redirect to home
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Failed to load diagram:", error);
+        navigate("/");
+      }
+    };
+
+    loadDiagram();
+  }, [id, navigate, isDbReady]);
 
   // Auto-save diagram when code changes
   useEffect(() => {
@@ -40,31 +93,51 @@ function App() {
   }, [code, currentDiagram]);
 
   const handleDiagramSelect = (diagram: Diagram) => {
-    setCurrentDiagram(diagram);
-    setCode(diagram.code);
+    navigate(`/${diagram.id}`);
   };
 
   const handleDiagramCreate = (diagram: Diagram) => {
-    setCurrentDiagram(diagram);
-    setCode(diagram.code);
+    navigate(`/${diagram.id}`);
   };
 
   return (
     <SidebarProvider>
       <AppSidebar
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
         currentDiagram={currentDiagram}
         onDiagramSelect={handleDiagramSelect}
         onDiagramCreate={handleDiagramCreate}
       />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger />
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
           <div className="flex items-center gap-2">
+            <SidebarTrigger />
             <h1 className="text-lg font-semibold">
               {currentDiagram ? currentDiagram.name : "Mermaid Diagram Editor"}
             </h1>
+          </div>
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("preview")}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === "preview"
+                  ? "bg-background shadow-sm"
+                  : "hover:bg-background/50"
+              }`}
+              title="Preview"
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("editor")}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === "editor"
+                  ? "bg-background shadow-sm"
+                  : "hover:bg-background/50"
+              }`}
+              title="Editor"
+            >
+              <FileCode className="h-4 w-4" />
+            </button>
           </div>
         </header>
         <div
@@ -85,6 +158,15 @@ function App() {
         </div>
       </SidebarInset>
     </SidebarProvider>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<DiagramView />} />
+      <Route path="/:id" element={<DiagramView />} />
+    </Routes>
   );
 }
 

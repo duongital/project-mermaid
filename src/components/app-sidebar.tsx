@@ -11,9 +11,6 @@ import {
   SidebarMenuItem,
 } from "@/ui/sidebar";
 import {
-  FileCode,
-  Eye,
-  Columns2,
   Settings,
   Plus,
   Trash2,
@@ -34,19 +31,13 @@ import {
   AlertDialogTitle,
 } from "@/ui/alert-dialog";
 
-type ViewMode = "preview" | "editor" | "split";
-
 interface AppSidebarProps {
-  viewMode: ViewMode;
-  onViewModeChange: (mode: ViewMode) => void;
   currentDiagram: Diagram | null;
   onDiagramSelect: (diagram: Diagram) => void;
   onDiagramCreate: (diagram: Diagram) => void;
 }
 
 export function AppSidebar({
-  viewMode,
-  onViewModeChange,
   currentDiagram,
   onDiagramSelect,
   onDiagramCreate,
@@ -123,41 +114,6 @@ export function AppSidebar({
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>View Mode</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={viewMode === "preview"}
-                    onClick={() => onViewModeChange("preview")}
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span>Preview</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={viewMode === "split"}
-                    onClick={() => onViewModeChange("split")}
-                  >
-                    <Columns2 className="h-4 w-4" />
-                    <span>Split View</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={viewMode === "editor"}
-                    onClick={() => onViewModeChange("editor")}
-                  >
-                    <FileCode className="h-4 w-4" />
-                    <span>Editor</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-
           <SidebarGroup>
             <div className="flex items-center justify-between px-2 pb-2">
               <SidebarGroupLabel>My Diagrams</SidebarGroupLabel>
