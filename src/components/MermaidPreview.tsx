@@ -141,26 +141,28 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           {/* <CardTitle>Preview</CardTitle> */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 border rounded-md">
+          <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 border rounded-md">
               <Button
                 onClick={handleZoomOut}
                 variant="ghost"
-                size="icon"
+                size="sm"
+                className="h-7 w-7"
                 title="Zoom Out"
               >
-                <ZoomOut className="h-4 w-4" />
+                <ZoomOut className="h-3 w-3" />
               </Button>
-              <span className="text-sm font-medium px-2 min-w-[4rem] text-center">
+              <span className="text-xs font-medium px-1 min-w-[2.5rem] text-center">
                 {zoom}%
               </span>
               <Button
                 onClick={handleZoomIn}
                 variant="ghost"
-                size="icon"
+                size="sm"
+                className="h-7 w-7"
                 title="Zoom In"
               >
-                <ZoomIn className="h-4 w-4" />
+                <ZoomIn className="h-3 w-3" />
               </Button>
             </div>
             {/* <Button
@@ -173,11 +175,12 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
             </Button> */}
             <Button
               onClick={resetZoom}
-              variant="outline"
-              size="icon"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7"
               title="Reset Zoom"
             >
-              <RotateCw className="h-4 w-4" />
+              <RotateCw className="h-3 w-3" />
             </Button>
           </div>
         </div>
