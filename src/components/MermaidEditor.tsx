@@ -1,3 +1,6 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
+import { Textarea } from "@/ui/textarea"
+
 interface MermaidEditorProps {
   code: string;
   onChange: (code: string) => void;
@@ -5,15 +8,19 @@ interface MermaidEditorProps {
 
 export default function MermaidEditor({ code, onChange }: MermaidEditorProps) {
   return (
-    <div className="editor-container">
-      <h2>Mermaid Code Editor</h2>
-      <textarea
-        value={code}
-        onChange={(e) => onChange(e.target.value)}
-        className="code-editor"
-        spellCheck={false}
-        placeholder="Enter your Mermaid diagram code here..."
-      />
-    </div>
+    <Card className="h-full flex flex-col">
+      <CardHeader>
+        <CardTitle>Mermaid Code Editor</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-1 flex">
+        <Textarea
+          value={code}
+          onChange={(e) => onChange(e.target.value)}
+          className="font-mono resize-none h-full"
+          spellCheck={false}
+          placeholder="Enter your Mermaid diagram code here..."
+        />
+      </CardContent>
+    </Card>
   );
 }

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import panzoom, { type PanZoom } from "panzoom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Button } from "@/ui/button";
+import { ZoomIn, ZoomOut, Maximize2, RotateCw } from "lucide-react";
 
 interface MermaidPreviewProps {
   code: string;
@@ -133,42 +136,56 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
   };
 
   return (
-    <div className="preview-container">
-      <div className="preview-header">
-        <h2>Preview</h2>
-        <div className="preview-controls">
-          <div className="zoom-controls">
-            <button
-              onClick={handleZoomOut}
-              className="control-btn"
-              title="Zoom Out"
+    <Card className="h-full flex flex-col">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Preview</CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 border rounded-md">
+              <Button
+                onClick={handleZoomOut}
+                variant="ghost"
+                size="icon"
+                title="Zoom Out"
+              >
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium px-2 min-w-[4rem] text-center">
+                {zoom}%
+              </span>
+              <Button
+                onClick={handleZoomIn}
+                variant="ghost"
+                size="icon"
+                title="Zoom In"
+              >
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button
+              onClick={handleCenter}
+              variant="outline"
+              size="icon"
+              title="Center"
             >
-              −
-            </button>
-            <span className="zoom-level">{zoom}%</span>
-            <button
-              onClick={handleZoomIn}
-              className="control-btn"
-              title="Zoom In"
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={resetZoom}
+              variant="outline"
+              size="icon"
+              title="Reset Zoom"
             >
-              +
-            </button>
+              <RotateCw className="h-4 w-4" />
+            </Button>
           </div>
-          <button onClick={handleCenter} className="control-btn" title="Center">
-            ⊙
-          </button>
-          <button
-            onClick={resetZoom}
-            className="control-btn"
-            title="Reset Zoom"
-          >
-            ⟲
-          </button>
         </div>
-      </div>
-      <div ref={containerRef} className="mermaid-preview-wrapper">
-        <div ref={svgContainerRef} className="mermaid-preview"></div>
-      </div>
-    </div>
+      </CardHeader>
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <div ref={containerRef} className="w-full h-full relative">
+          <div ref={svgContainerRef} className="w-full h-full flex items-center justify-center"></div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
