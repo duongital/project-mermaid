@@ -111,13 +111,15 @@ export function AppSidebar({
         <SidebarHeader>
           <div className="px-2 py-1 flex items-center gap-2">
             <img src="/vite.svg" alt="Vite" className="h-6 w-6" />
-            <h2 className="text-lg font-semibold">Project Mermaid</h2>
+            <h2 className="text-lg font-semibold font-mono">Project Mermaid</h2>
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
             <div className="flex items-center justify-between px-2 pb-2">
-              <SidebarGroupLabel>My Diagrams</SidebarGroupLabel>
+              <SidebarGroupLabel>
+                <span className="text-lg">My Diagrams</span>
+              </SidebarGroupLabel>
               <Button
                 size="icon"
                 variant="outline"
@@ -131,7 +133,7 @@ export function AppSidebar({
               <SidebarMenu>
                 {diagrams.length === 0 ? (
                   <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                    No diagrams yet. Click + to create one.
+                    No diagrams yet. <br /> Click + to create one.
                   </div>
                 ) : (
                   diagrams.map((diagram) => (
