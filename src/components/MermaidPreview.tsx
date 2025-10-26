@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import mermaid from 'mermaid';
-import panzoom, { PanZoom } from 'panzoom';
+import { useEffect, useRef, useState } from "react";
+import mermaid from "mermaid";
+import panzoom, { type PanZoom } from "panzoom";
 
 interface MermaidPreviewProps {
   code: string;
@@ -15,8 +15,8 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: false,
-      theme: 'default',
-      securityLevel: 'loose',
+      theme: "default",
+      securityLevel: "loose",
     });
   }, []);
 
@@ -25,7 +25,7 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
 
     const renderDiagram = async () => {
       try {
-        const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
+        const id = "mermaid-" + Math.random().toString(36).substring(2, 11);
         const { svg } = await mermaid.render(id, code);
         if (svgContainerRef.current) {
           svgContainerRef.current.innerHTML = svg;
@@ -35,22 +35,22 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
             panzoomInstanceRef.current.dispose();
           }
 
-          const svgElement = svgContainerRef.current.querySelector('svg');
+          const svgElement = svgContainerRef.current.querySelector("svg");
           if (svgElement) {
             const instance = panzoom(svgElement, {
-              maxZoom: 10,
+              maxZoom: 20,
               minZoom: 0.1,
               bounds: true,
               boundsPadding: 0.1,
               zoomSpeed: 0.2,
               smoothScroll: false,
-              pinchSpeed: 2,
+              // pinchSpeed: 8,
             });
 
             panzoomInstanceRef.current = instance;
 
             // Update zoom percentage on zoom
-            instance.on('zoom', () => {
+            instance.on("zoom", () => {
               const transform = instance.getTransform();
               setZoom(Math.round(transform.scale * 100));
             });
@@ -61,7 +61,9 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
         }
       } catch (error) {
         if (svgContainerRef.current) {
-          svgContainerRef.current.innerHTML = `<div class="error">Error rendering diagram: ${error instanceof Error ? error.message : 'Unknown error'}</div>`;
+          svgContainerRef.current.innerHTML = `<div class="error">Error rendering diagram: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }</div>`;
         }
       }
     };
@@ -89,7 +91,7 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
 
   const resetZoom = () => {
     if (panzoomInstanceRef.current && svgContainerRef.current) {
-      const svgElement = svgContainerRef.current.querySelector('svg');
+      const svgElement = svgContainerRef.current.querySelector("svg");
       if (svgElement && containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
         const svgRect = svgElement.getBBox();
@@ -109,15 +111,21 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
   };
 
   const handleCenter = () => {
-    if (panzoomInstanceRef.current && svgContainerRef.current && containerRef.current) {
-      const svgElement = svgContainerRef.current.querySelector('svg');
+    if (
+      panzoomInstanceRef.current &&
+      svgContainerRef.current &&
+      containerRef.current
+    ) {
+      const svgElement = svgContainerRef.current.querySelector("svg");
       if (svgElement) {
         const containerRect = containerRef.current.getBoundingClientRect();
         const svgRect = svgElement.getBBox();
         const transform = panzoomInstanceRef.current.getTransform();
 
-        const centerX = (containerRect.width - svgRect.width * transform.scale) / 2;
-        const centerY = (containerRect.height - svgRect.height * transform.scale) / 2;
+        const centerX =
+          (containerRect.width - svgRect.width * transform.scale) / 2;
+        const centerY =
+          (containerRect.height - svgRect.height * transform.scale) / 2;
 
         panzoomInstanceRef.current.moveTo(centerX, centerY);
       }
@@ -130,18 +138,30 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
         <h2>Preview</h2>
         <div className="preview-controls">
           <div className="zoom-controls">
-            <button onClick={handleZoomOut} className="control-btn" title="Zoom Out">
+            <button
+              onClick={handleZoomOut}
+              className="control-btn"
+              title="Zoom Out"
+            >
               −
             </button>
             <span className="zoom-level">{zoom}%</span>
-            <button onClick={handleZoomIn} className="control-btn" title="Zoom In">
+            <button
+              onClick={handleZoomIn}
+              className="control-btn"
+              title="Zoom In"
+            >
               +
             </button>
           </div>
           <button onClick={handleCenter} className="control-btn" title="Center">
             ⊙
           </button>
-          <button onClick={resetZoom} className="control-btn" title="Reset Zoom">
+          <button
+            onClick={resetZoom}
+            className="control-btn"
+            title="Reset Zoom"
+          >
             ⟲
           </button>
         </div>
