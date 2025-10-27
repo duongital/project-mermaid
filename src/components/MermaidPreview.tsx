@@ -20,7 +20,7 @@ export default function MermaidPreview({
   initialPanX = 50,
   initialPanY = 50,
   onZoomChange,
-  onPositionChange,
+  onPositionChange
 }: MermaidPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -63,7 +63,7 @@ export default function MermaidPreview({
               minZoom: 0.1,
               bounds: true,
               boundsPadding: 0.1,
-              zoomSpeed: 3,
+              zoomSpeed: 0.2, // using 3 if apply Cmd + Zoom
               smoothScroll: false,
               // Only allow zoom when Ctrl (Windows) or Cmd (Mac) is pressed
               // beforeWheel: (e) => {
@@ -90,10 +90,7 @@ export default function MermaidPreview({
             });
 
             // Restore saved zoom and position or reset to fit content
-            if (
-              !hasRestoredZoomRef.current &&
-              (initialZoom !== 100 || initialPanX !== 50 || initialPanY !== 50)
-            ) {
+            if (!hasRestoredZoomRef.current && (initialZoom !== 100 || initialPanX !== 50 || initialPanY !== 50)) {
               // Restore the saved zoom level and position
               const scale = initialZoom / 100;
               instance.moveTo(initialPanX, initialPanY);
