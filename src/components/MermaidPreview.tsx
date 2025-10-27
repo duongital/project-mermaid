@@ -63,7 +63,7 @@ export default function MermaidPreview({
               minZoom: 0.1,
               bounds: true,
               boundsPadding: 0.1,
-              zoomSpeed: 0.2, // using 3 if apply Cmd + Zoom
+              zoomSpeed: 3,
               smoothScroll: false,
               // Only allow zoom when Ctrl (Windows) or Cmd (Mac) is pressed
               // beforeWheel: (e) => {
@@ -92,10 +92,18 @@ export default function MermaidPreview({
             // Restore saved zoom and position or reset to fit content
             if (!hasRestoredZoomRef.current && (initialZoom !== 100 || initialPanX !== 50 || initialPanY !== 50)) {
               // Restore the saved zoom level and position
-              const scale = initialZoom / 100;
-              instance.moveTo(initialPanX, initialPanY);
-              instance.zoomAbs(0, 0, scale);
-              setZoom(initialZoom);
+              // Use setTimeout to ensure the transform is applied after panzoom initialization
+              setTimeout(() => {
+                const scale = initialZoom / 100;
+                // First set the scale without changing position by zooming at the center
+                const rect = svgElement.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                instance.zoomAbs(centerX, centerY, scale);
+                // Then move to the saved position
+                instance.moveTo(initialPanX, initialPanY);
+                setZoom(initialZoom);
+              }, 0);
               hasRestoredZoomRef.current = true;
             } else if (!hasRestoredZoomRef.current) {
               // First time rendering, reset zoom to fit content
