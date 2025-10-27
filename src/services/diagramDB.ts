@@ -4,12 +4,13 @@ export interface Diagram {
   id?: string;
   name: string;
   code: string;
+  zoom?: number; // Zoom percentage (default 100)
   createdAt: Date;
   updatedAt: Date;
 }
 
 const DB_NAME = "MermaidDiagramsDB";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "diagrams";
 
 class DiagramDB {
@@ -30,6 +31,7 @@ class DiagramDB {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
+        const oldVersion = event.oldVersion;
 
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const objectStore = db.createObjectStore(STORE_NAME, {
@@ -39,6 +41,26 @@ class DiagramDB {
           objectStore.createIndex("name", "name", { unique: false });
           objectStore.createIndex("createdAt", "createdAt", { unique: false });
           objectStore.createIndex("updatedAt", "updatedAt", { unique: false });
+        }
+
+        // Migration from version 1 to 2: add zoom field
+        if (oldVersion < 2) {
+          const transaction = (event.target as IDBOpenDBRequest).transaction;
+          const store = transaction?.objectStore(STORE_NAME);
+
+          if (store) {
+            // Get all records and update them with default zoom value
+            const getAllRequest = store.getAll();
+            getAllRequest.onsuccess = () => {
+              const diagrams = getAllRequest.result;
+              diagrams.forEach((diagram: Diagram) => {
+                if (diagram.zoom === undefined) {
+                  diagram.zoom = 100; // Default zoom percentage
+                  store.put(diagram);
+                }
+              });
+            };
+          }
         }
       };
     });

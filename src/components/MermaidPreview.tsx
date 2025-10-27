@@ -7,13 +7,20 @@ import { ZoomIn, ZoomOut, RotateCw } from "lucide-react";
 
 interface MermaidPreviewProps {
   code: string;
+  initialZoom?: number;
+  onZoomChange?: (zoom: number) => void;
 }
 
-export default function MermaidPreview({ code }: MermaidPreviewProps) {
+export default function MermaidPreview({
+  code,
+  initialZoom = 100,
+  onZoomChange
+}: MermaidPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const panzoomInstanceRef = useRef<PanZoom | null>(null);
-  const [zoom, setZoom] = useState(100);
+  const [zoom, setZoom] = useState(initialZoom);
+  const hasRestoredZoomRef = useRef(false);
 
   useEffect(() => {
     mermaid.initialize({
@@ -22,6 +29,11 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
       securityLevel: "loose",
     });
   }, []);
+
+  // Reset zoom restoration flag when initialZoom changes (diagram switched)
+  useEffect(() => {
+    hasRestoredZoomRef.current = false;
+  }, [initialZoom]);
 
   useEffect(() => {
     if (!svgContainerRef.current || !code.trim()) return;
@@ -60,11 +72,23 @@ export default function MermaidPreview({ code }: MermaidPreviewProps) {
             // Update zoom percentage on zoom
             instance.on("zoom", () => {
               const transform = instance.getTransform();
-              setZoom(Math.round(transform.scale * 100));
+              const newZoom = Math.round(transform.scale * 100);
+              setZoom(newZoom);
+              onZoomChange?.(newZoom);
             });
 
-            // Reset zoom to fit content
-            resetZoom();
+            // Restore saved zoom or reset to fit content
+            if (!hasRestoredZoomRef.current && initialZoom !== 100) {
+              // Restore the saved zoom level
+              const scale = initialZoom / 100;
+              instance.zoomAbs(0, 0, scale);
+              setZoom(initialZoom);
+              hasRestoredZoomRef.current = true;
+            } else if (!hasRestoredZoomRef.current) {
+              // First time rendering, reset zoom to fit content
+              resetZoom();
+              hasRestoredZoomRef.current = true;
+            }
           }
         }
       } catch (error) {

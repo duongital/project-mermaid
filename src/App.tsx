@@ -23,6 +23,7 @@ function DiagramView() {
   const [viewMode, setViewMode] = useState<ViewMode>("preview");
   const [currentDiagram, setCurrentDiagram] = useState<Diagram | null>(null);
   const [isDbReady, setIsDbReady] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState<number>(100);
 
   // Initialize database
   useEffect(() => {
@@ -58,6 +59,7 @@ function DiagramView() {
         if (diagram) {
           setCurrentDiagram(diagram);
           setCode(diagram.code);
+          setCurrentZoom(diagram.zoom || 100);
         } else {
           // Diagram not found, redirect to home
           navigate("/");
@@ -86,6 +88,22 @@ function DiagramView() {
 
     return () => clearTimeout(timeoutId);
   }, [code, currentDiagram]);
+
+  // Auto-save zoom when it changes
+  useEffect(() => {
+    if (!currentDiagram?.id) return;
+
+    const diagramId = currentDiagram.id;
+    const timeoutId = setTimeout(async () => {
+      try {
+        await diagramDB.update(diagramId, { zoom: currentZoom });
+      } catch (error) {
+        console.error("Failed to auto-save zoom:", error);
+      }
+    }, 500); // Auto-save after 0.5 second of inactivity
+
+    return () => clearTimeout(timeoutId);
+  }, [currentZoom, currentDiagram]);
 
   const handleDiagramSelect = (diagram: Diagram) => {
     navigate(`/${diagram.id}`);
@@ -147,7 +165,11 @@ function DiagramView() {
           )}
           {(viewMode === "preview" || viewMode === "split") && (
             <div className={viewMode === "split" ? "flex-1" : "w-full"}>
-              <MermaidPreview code={code} />
+              <MermaidPreview
+                code={code}
+                initialZoom={currentZoom}
+                onZoomChange={setCurrentZoom}
+              />
             </div>
           )}
         </div>
