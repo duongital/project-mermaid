@@ -8,13 +8,19 @@ import { ZoomIn, ZoomOut, RotateCw } from "lucide-react";
 interface MermaidPreviewProps {
   code: string;
   initialZoom?: number;
+  initialPanX?: number;
+  initialPanY?: number;
   onZoomChange?: (zoom: number) => void;
+  onPositionChange?: (panX: number, panY: number) => void;
 }
 
 export default function MermaidPreview({
   code,
   initialZoom = 100,
-  onZoomChange
+  initialPanX = 50,
+  initialPanY = 50,
+  onZoomChange,
+  onPositionChange
 }: MermaidPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -30,10 +36,10 @@ export default function MermaidPreview({
     });
   }, []);
 
-  // Reset zoom restoration flag when initialZoom changes (diagram switched)
+  // Reset restoration flag when initial values change (diagram switched)
   useEffect(() => {
     hasRestoredZoomRef.current = false;
-  }, [initialZoom]);
+  }, [initialZoom, initialPanX, initialPanY]);
 
   useEffect(() => {
     if (!svgContainerRef.current || !code.trim()) return;
@@ -69,18 +75,25 @@ export default function MermaidPreview({
 
             panzoomInstanceRef.current = instance;
 
-            // Update zoom percentage on zoom
+            // Update zoom percentage and position on zoom/pan
             instance.on("zoom", () => {
               const transform = instance.getTransform();
               const newZoom = Math.round(transform.scale * 100);
               setZoom(newZoom);
               onZoomChange?.(newZoom);
+              onPositionChange?.(transform.x, transform.y);
             });
 
-            // Restore saved zoom or reset to fit content
-            if (!hasRestoredZoomRef.current && initialZoom !== 100) {
-              // Restore the saved zoom level
+            instance.on("pan", () => {
+              const transform = instance.getTransform();
+              onPositionChange?.(transform.x, transform.y);
+            });
+
+            // Restore saved zoom and position or reset to fit content
+            if (!hasRestoredZoomRef.current && (initialZoom !== 100 || initialPanX !== 50 || initialPanY !== 50)) {
+              // Restore the saved zoom level and position
               const scale = initialZoom / 100;
+              instance.moveTo(initialPanX, initialPanY);
               instance.zoomAbs(0, 0, scale);
               setZoom(initialZoom);
               hasRestoredZoomRef.current = true;

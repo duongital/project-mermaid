@@ -24,6 +24,8 @@ function DiagramView() {
   const [currentDiagram, setCurrentDiagram] = useState<Diagram | null>(null);
   const [isDbReady, setIsDbReady] = useState(false);
   const [currentZoom, setCurrentZoom] = useState<number>(100);
+  const [currentPanX, setCurrentPanX] = useState<number>(50);
+  const [currentPanY, setCurrentPanY] = useState<number>(50);
 
   // Initialize database
   useEffect(() => {
@@ -60,6 +62,8 @@ function DiagramView() {
           setCurrentDiagram(diagram);
           setCode(diagram.code);
           setCurrentZoom(diagram.zoom || 100);
+          setCurrentPanX(diagram.panX || 50);
+          setCurrentPanY(diagram.panY || 50);
         } else {
           // Diagram not found, redirect to home
           navigate("/");
@@ -105,12 +109,33 @@ function DiagramView() {
     return () => clearTimeout(timeoutId);
   }, [currentZoom, currentDiagram]);
 
+  // Auto-save pan position when it changes
+  useEffect(() => {
+    if (!currentDiagram?.id) return;
+
+    const diagramId = currentDiagram.id;
+    const timeoutId = setTimeout(async () => {
+      try {
+        await diagramDB.update(diagramId, { panX: currentPanX, panY: currentPanY });
+      } catch (error) {
+        console.error("Failed to auto-save pan position:", error);
+      }
+    }, 500); // Auto-save after 0.5 second of inactivity
+
+    return () => clearTimeout(timeoutId);
+  }, [currentPanX, currentPanY, currentDiagram]);
+
   const handleDiagramSelect = (diagram: Diagram) => {
     navigate(`/${diagram.id}`);
   };
 
   const handleDiagramCreate = (diagram: Diagram) => {
     navigate(`/${diagram.id}`);
+  };
+
+  const handlePositionChange = (panX: number, panY: number) => {
+    setCurrentPanX(panX);
+    setCurrentPanY(panY);
   };
 
   return (
@@ -168,7 +193,10 @@ function DiagramView() {
               <MermaidPreview
                 code={code}
                 initialZoom={currentZoom}
+                initialPanX={currentPanX}
+                initialPanY={currentPanY}
                 onZoomChange={setCurrentZoom}
+                onPositionChange={handlePositionChange}
               />
             </div>
           )}

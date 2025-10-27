@@ -5,12 +5,14 @@ export interface Diagram {
   name: string;
   code: string;
   zoom?: number; // Zoom percentage (default 100)
+  panX?: number; // Pan X position
+  panY?: number; // Pan Y position
   createdAt: Date;
   updatedAt: Date;
 }
 
 const DB_NAME = "MermaidDiagramsDB";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORE_NAME = "diagrams";
 
 class DiagramDB {
@@ -58,6 +60,29 @@ class DiagramDB {
                   diagram.zoom = 100; // Default zoom percentage
                   store.put(diagram);
                 }
+              });
+            };
+          }
+        }
+
+        // Migration from version 2 to 3: add panX and panY fields
+        if (oldVersion < 3) {
+          const transaction = (event.target as IDBOpenDBRequest).transaction;
+          const store = transaction?.objectStore(STORE_NAME);
+
+          if (store) {
+            // Get all records and update them with default pan values
+            const getAllRequest = store.getAll();
+            getAllRequest.onsuccess = () => {
+              const diagrams = getAllRequest.result;
+              diagrams.forEach((diagram: Diagram) => {
+                if (diagram.panX === undefined) {
+                  diagram.panX = 50; // Default X position (top-left with padding)
+                }
+                if (diagram.panY === undefined) {
+                  diagram.panY = 50; // Default Y position (top-left with padding)
+                }
+                store.put(diagram);
               });
             };
           }
