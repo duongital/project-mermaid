@@ -58,7 +58,11 @@ export function AppSidebar({
   const loadDiagrams = async () => {
     try {
       const allDiagrams = await diagramDB.getAll();
-      setDiagrams(allDiagrams);
+      // Sort diagrams alphabetically by name (case-insensitive)
+      const sortedDiagrams = allDiagrams.sort((a, b) =>
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+      );
+      setDiagrams(sortedDiagrams);
     } catch (error) {
       console.error("Failed to load diagrams:", error);
     }
